@@ -20,13 +20,16 @@ END {
     # the comma after the last element.
     last = i
 
+    # This is a hack-around to avoid having to escape every " char in a string.
+    q = "\""
+
     # Constructing the output JSON.
     out="["
     for(j=1;j<=i;j++) {
-        out = out "{\"MetricName\":\"" fields[j] "\","
-        out = out "\"Timestamp\":\"" strftime("%FT%T%z") "\","
-        out = out "\"Value\":" sprintf("%d", memvalues[j]) ","
-        out = out "\"Unit\":\"Kilobytes\""
+        out = out "{" q "MetricName" q ":" q fields[j] q ","
+        out = out q "Timestamp" q ":" q strftime("%FT%T%z") q ","
+        out = out q "Value" q ":" sprintf("%d", memvalues[j]) ","
+        out = out q "Unit" q ":" q "Kilobytes" q
         out = out "}"
         if (j<last) out = out ","
     }
@@ -38,5 +41,8 @@ END {
 
 AWS_ACCESS_KEY_ID='{{ aws_access_key_id }}' \
     AWS_SECRET_ACCESS_KEY='{{ aws_secret_access_key }}' \
-        aws cloudwatch put-metric-data --region "{{ cloudwatch_region }}" --namespace "{{ cloudwatch_namespace }}" --metric-data file://"$metrics_json"
+        aws cloudwatch put-metric-data \
+            --region "{{ cloudwatch_region }}" \
+            --namespace "{{ cloudwatch_namespace }}" \
+            --metric-data file://"$metrics_json"
 
