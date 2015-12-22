@@ -4,10 +4,7 @@ base_path=/tmp
 
 cd "$base_path"
 
-# AWS magick IP whence you can query metadata about your EC2 instances!
-aws_instance="$(curl -s --connect-timeout 1 http://169.254.169.254/latest/meta-data/instance-id)"
-
-tobucketfile="$(mktemp -u XXXXXXXXXXXX)_$(uname -n)_${aws_instance}_$(date +%FT%T%z)"
+tobucketfile="$(mktemp -u XXXXXXXXXXXX)_$(uname -n)_$(date +%FT%T%z)"
 s3endpoint="{{ s3_endpoint }}"
 
 
@@ -43,4 +40,7 @@ END {
 AWS_ACCESS_KEY_ID='{{ aws_access_key_id }}' \
     AWS_SECRET_ACCESS_KEY='{{ aws_secret_access_key }}' \
         aws s3 cp --quiet "$tobucketfile" s3://"$s3endpoint/$tobucketfile"
+
+# And clean up the used file.
+rm -f "$tobucketfile"
 

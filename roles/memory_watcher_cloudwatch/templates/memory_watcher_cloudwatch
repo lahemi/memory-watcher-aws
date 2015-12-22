@@ -4,10 +4,7 @@ base_path=/tmp
 
 cd "$base_path"
 
-# AWS magick IP whence you can query metadata about your EC2 instances!
-aws_instance="$(curl -s --connect-timeout 1 http://169.254.169.254/latest/meta-data/instance-id)"
-
-metrics_json="$(mktemp -u XXXXXXXXXXXX)_$(uname -n)_${aws_instance}_$(date +%FT%T%z)"
+metrics_json="$(mktemp -u XXXXXXXXXXXX)_$(uname -n)_$(date +%FT%T%z)"
 
 
 awk '
@@ -47,4 +44,7 @@ AWS_ACCESS_KEY_ID='{{ aws_access_key_id }}' \
             --region "{{ cloudwatch_region }}" \
             --namespace "{{ cloudwatch_namespace }}" \
             --metric-data file://"$metrics_json"
+
+# And clean up the used file.
+rm -f "$metrics_json"
 
