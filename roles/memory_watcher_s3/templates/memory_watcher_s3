@@ -25,7 +25,7 @@ END {
 
     # Constructing the output JSON.
     out="{\"MemoryValues\":["
-    for(j=1;j<i;j++) {
+    for(j=0;j<i;j++) {
         out = out json_keyval_obj(fields[j], memvalues[j])
         if (j<last) out = out ","
     }
