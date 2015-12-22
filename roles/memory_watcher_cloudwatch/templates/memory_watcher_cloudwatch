@@ -10,18 +10,19 @@ metrics_json="$(mktemp -u XXXXXXXXXXXX)_$(uname -n)_$(date +%FT%T%z)"
 awk '
 
 /Mem|Cache|Swap/ {
-    fields[i++]  = substr($1, 1, length($1)-1) # Drop the : char at the end
+    i++
+    fields[i]  = substr($1, 1, length($1)-1) # Drop the : char at the end
     memvalues[i] = sprintf("%d", $2)           # Output values in default KB
 }
 
 END {
     # This is used to leave out
     # the comma after the last element.
-    last = i-1
+    last = i
 
     # Constructing the output JSON.
     out="["
-    for(j=0;j<i;j++) {
+    for(j=1;j<=i;j++) {
         out = out "{\"MetricName\":\"" fields[j] "\","
         out = out "\"Timestamp\":\"" strftime("%FT%T%z") "\","
         out = out "\"Value\":" sprintf("%d", memvalues[j]) ","

@@ -14,18 +14,19 @@ function json_keyval_obj(field, memval) {
 }
 
 /Mem|Cache|Swap/ {
-    fields[i++]  = substr($1, 1, length($1)-1) # Drop the : char at the end
+    i++
+    fields[i]    = substr($1, 1, length($1)-1) # Drop the : char at the end
     memvalues[i] = sprintf("%d", $2)           # Output values in default KB
 }
 
 END {
     # This is used to leave out
     # the comma after the last element.
-    last = i-1
+    last = i
 
     # Constructing the output JSON.
     out="{\"MemoryValues\":["
-    for(j=0;j<i;j++) {
+    for(j=1;j<=i;j++) {
         out = out json_keyval_obj(fields[j], memvalues[j])
         if (j<last) out = out ","
     }
