@@ -1,0 +1,19 @@
+---
+- hosts: memwatcher
+  remote_user: youruser
+  become: yes
+  become_user: root
+  gather_facts: false
+
+  vars:
+    script_dir:            "/opt/scripts"
+    s3_endpoint:           ""
+    cloudwatch_region:     "eu-west-1"
+    cloudwatch_namespace:  "Memory Usage"
+    aws_access_key_id:     ""
+    aws_secret_access_key: ""
+
+  roles:
+    - memory_watcher_s3
+    - memory_watcher_cloudwatch
+

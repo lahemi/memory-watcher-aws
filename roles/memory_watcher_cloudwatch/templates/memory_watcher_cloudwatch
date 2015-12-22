@@ -1,0 +1,41 @@
+#!/bin/bash
+
+base_path=/tmp
+
+cd "$base_path"
+
+metrics_json="$(mktemp -u XXXXXXXXXXXX)_$(uname -n)_$(date +%FT%T%z)"
+
+
+awk '
+
+/Mem|Cache|Swap/ {
+    fields[i++]  = substr($1, 1, length($1)-1) # Drop the : char at the end
+    memvalues[i] = sprintf("%d", $2)           # Output values in default KB
+}
+
+END {
+    # This is used to leave out
+    # the comma after the last element.
+    last = i-1
+
+    # Constructing the output JSON.
+    out="["
+    for(j=1;j<i;j++) {
+        out = out "{\"MetricName\":\"" fields[j] "\","
+        out = out "\"Timestamp\":\"" strftime("%FT%T%z") "\","
+        out = out "\"Value\":" sprintf("%d", memvalues[j]) ","
+        out = out "\"Unit\":\"Kilobytes\""
+        out = out "}"
+        if (j<last) out = out ","
+    }
+    out = out "]"
+
+    print(out)
+
+}' /proc/meminfo > "$metrics_json"
+
+AWS_ACCESS_KEY_ID='{{ aws_access_key_id }}' \
+    AWS_SECRET_ACCESS_KEY='{{ aws_secret_access_key }}' \
+        aws cloudwatch put-metric-data --region "{{ cloudwatch_region }}" --namespace "{{ cloudwatch_namespace }}" --metric-data file://"$metrics_json"
+

@@ -1,0 +1,34 @@
+
+This setup does the following:
+
+
+    - Installs, on the given servers, a small mostly awk scripts
+      which gather information from /proc/meminfo.
+
+    - Sets cron to run the scripts every minute.
+
+    - Gathered information will be send to the provided S3 bucket
+      or to cloudwatch as a metric or do both of these.
+
+
+
+Getting started:
+
+
+    - Obviously, the target servers need the AWS CLI tool installed.
+      The provided awk scripts won't work outside of Linux, too.
+
+    - Configure the setup to your liking in main.yml.
+      If you are using root as the login user, you don't need
+      the `become_user` stuff.
+
+    - List your target hosts in the `hosts` file. You can use
+      the "deploy script" for convenience when running Ansible.
+
+    - You need to have a user with the AWS access keys set up.
+      Better to follow the principle of least privilege,
+      meaning, give conservative permissions only to S3
+      and|or Cloudwatch and preferably do not allow logging
+      in with the user.
+
+

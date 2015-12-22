@@ -1,0 +1,11 @@
+---
+
+- name: Create /opt/scripts directory
+  file: path="{{ script_dir }}" state=directory
+
+- name: Install the memory watcher script on the server
+  template: src=memory_watcher_s3 dest="{{ script_dir }}/" owner=root group=root mode=0755
+
+- name: Set up cron job for memory watcher
+  cron: name="memory watcher S3" job="{{ script_dir }}/memory_watcher_s3"
+
