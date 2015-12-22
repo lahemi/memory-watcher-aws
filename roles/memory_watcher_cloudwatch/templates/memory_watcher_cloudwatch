@@ -4,7 +4,10 @@ base_path=/tmp
 
 cd "$base_path"
 
-metrics_json="$(mktemp -u XXXXXXXXXXXX)_$(uname -n)_$(date +%FT%T%z)"
+# AWS magick IP whence you can query metadata about your EC2 instances!
+aws_instance="$(curl -s --connect-timeout 1 http://169.254.169.254/latest/meta-data/instance-id)"
+
+metrics_json="$(mktemp -u XXXXXXXXXXXX)_$(uname -n)_${aws_instance}_$(date +%FT%T%z)"
 
 
 awk '
@@ -20,7 +23,6 @@ END {
     # the comma after the last element.
     last = i
 
-    # This is a hack-around to avoid having to escape every " char in a string.
     q = "\""
 
     # Constructing the output JSON.

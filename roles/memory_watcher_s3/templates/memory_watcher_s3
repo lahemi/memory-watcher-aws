@@ -4,7 +4,10 @@ base_path=/tmp
 
 cd "$base_path"
 
-tobucketfile="$(mktemp -u XXXXXXXXXXXX)_$(uname -n)_$(date +%FT%T%z)"
+# AWS magick IP whence you can query metadata about your EC2 instances!
+aws_instance="$(curl -s --connect-timeout 1 http://169.254.169.254/latest/meta-data/instance-id)"
+
+tobucketfile="$(mktemp -u XXXXXXXXXXXX)_$(uname -n)_${aws_instance}_$(date +%FT%T%z)"
 s3endpoint="{{ s3_endpoint }}"
 
 
